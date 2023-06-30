@@ -1,25 +1,29 @@
 #!/usr/bin/python3
-"""Island perimeter computing module.
+"""Prime game module.
 """
 
 
-def island_perimeter(grid):
-    """Computes the perimeter of an island with no lakes.
+def isWinner(x, nums):
+    """Determines the winner of a prime game session with `x` rounds.
     """
-    perimeter = 0
-    if type(grid) != list:
-        return 0
-    n = len(grid)
-    for i, row in enumerate(grid):
-        m = len(row)
-        for j, cell in enumerate(row):
-            if cell == 0:
-                continue
-            edges = (
-                i == 0 or (len(grid[i - 1]) > j and grid[i - 1][j] == 0),
-                j == m - 1 or (m > j + 1 and row[j + 1] == 0),
-                i == n - 1 or (len(grid[i + 1]) > j and grid[i + 1][j] == 0),
-                j == 0 or row[j - 1] == 0,
-            )
-            perimeter += sum(edges)
-    return perimeter
+    if x < 1 or not nums:
+        return None
+    marias_wins, bens_wins = 0, 0
+    # generate primes with a limit of the maximum number in nums
+    n = max(nums)
+    primes = [True for _ in range(1, n + 1, 1)]
+    primes[0] = False
+    for i, is_prime in enumerate(primes, 1):
+        if i == 1 or not is_prime:
+            continue
+        for j in range(i + i, n + 1, i):
+            primes[j - 1] = False
+    # filter the number of primes less than n in nums for each round
+    for _, n in zip(range(x), nums):
+        primes_count = len(list(filter(lambda x: x, primes[0: n])))
+        bens_wins += primes_count % 2 == 0
+        marias_wins += primes_count % 2 == 1
+    if marias_wins == bens_wins:
+        return None
+    return 'Maria' if marias_wins > bens_wins else 'Ben'
+
